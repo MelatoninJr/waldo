@@ -5,8 +5,8 @@ import waldo from './waldo.jpg'
 import mario from './mario.png'
 import fox from './fox.png'
 import star from './star.png'
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.1/firebase-app.js";
-import { collection, getDocs, addDoc, Timestamp, updateDoc, getFirestore, doc } from "https://www.gstatic.com/firebasejs/9.1.1/firebase-firestore.js"
+import { initializeApp } from "firebase/app";
+import { collection, getDocs, addDoc, Timestamp, updateDoc, getFirestore, doc } from "firebase/firestore"
 import Stopwatch from './stopwatch'
 
 const firebaseConfig = {
