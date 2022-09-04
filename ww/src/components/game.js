@@ -7,6 +7,7 @@ import fox from './fox.png'
 import star from './star.png'
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.1.1/firebase-app.js";
 import { collection, getDocs, addDoc, Timestamp, updateDoc, getFirestore, doc } from "https://www.gstatic.com/firebasejs/9.1.1/firebase-firestore.js"
+import Stopwatch from './stopwatch'
 
 const firebaseConfig = {
     apiKey: "AIzaSyAgNvtfRfpoYEiLtDgwy5zsGjhJyWBe_Zo",
@@ -22,17 +23,6 @@ const firebaseConfig = {
   const db = getFirestore()
   const storageref = collection(db, 'coordinates')
 
-  getDocs(storageref)
-  .then((snapshot) => {
-    let books = []
-    snapshot.docs.forEach((doc) => {
-        books.push({...doc.data(), id: doc.id})
-    })
-    console.log(books)
-  })
-  .catch(err => {
-      console.log(err.message)
-  })
 
 
 
@@ -41,6 +31,9 @@ const Game = (props) => {
     const [hoverarray, SetHoverArray] = useState([1])
     const [imagearray, SetImageArray] = useState([])
     const [storedarray, setStoredArray] = useState([])
+    const [counter, setCounter] = useState(0)
+    const [time, setTime] = useState(0);
+    const [running, setRunning] = useState(true);
     const inputRef = useRef(null)
     const marioRef = useRef(null)
     const imageboxRef = useRef(null)
@@ -51,10 +44,10 @@ const Game = (props) => {
 
 
 
-
+//OnClick of image get bounds for image and calculate (x,y) where clicked
 
     const placeCharacters = ( event ) => {
-        let bounds = event.target.getBoundingClientRect(); //OnClick of image get bounds for image and calculate (x,y) where clicked
+        let bounds = event.target.getBoundingClientRect(); 
         let x = event.clientX - bounds.left;
         let y = event.clientY - bounds.top;
    
@@ -75,13 +68,16 @@ const Game = (props) => {
                 imageboxRef.current.style.left = x + 'px'
                 imageboxRef.current.style.top = y + 'px'
             }
-        }, 200)
-
-
-        console.log(x, y)
-        
+        }, 200)        
       }
 
+
+
+
+
+//compareValues is ran on character guess selection
+//It retrieves the respective firebase info and compares
+//the selected spot to stored character coords
 
     const compareValues = (name) => {
         const storageref = collection(db, 'coordinates')
@@ -96,10 +92,11 @@ const Game = (props) => {
             if(name === 'mario') {
                 if(((characterPositions[1].current[1]) >= (characterPositions[0][name][1] - 50) && (characterPositions[1].current[1]) <= (characterPositions[0][name][1] + 50) && 
                     (characterPositions[1].current[1]) >= (characterPositions[0][name][1] - 50) && (characterPositions[1].current[1]) <= (characterPositions[0][name][1] + 50)
-                    
+
                 )) 
                 {
-
+                    let newcount = counter + 1
+                    setCounter(newcount)
                     console.log('You found Mario!')
                     mariostatus.current.style.opacity = '30%'
                 } 
@@ -110,7 +107,8 @@ const Game = (props) => {
                     
                 )) 
                 {
-
+                    let newcount = counter + 1
+                    setCounter(newcount)
                     console.log('You found Fox!')
                     foxstatus.current.style.opacity = '30%'
                 } 
@@ -123,21 +121,21 @@ const Game = (props) => {
                     
                 )) 
                 {
-
+                    let newcount = counter + 1
+                    setCounter(newcount)
                     console.log('You found Star!')
                     starstatus.current.style.opacity = '30%'
                 } 
 
             }
 
-            console.log(characterPositions)
         })
 
         SetImageArray([])
-
-
-
-
+        if(counter >= 2) {
+            setRunning(false)
+            alert('You won!')
+        }
 
     }
 
@@ -145,13 +143,12 @@ const Game = (props) => {
 
 
 
-      
+//Boxfollow is used to display a different cursor radius that follows you around
       const boxfollow = (event) => {
         const boxselector = marioRef.current
         let bounds = event.target.getBoundingClientRect();
         var x = event.clientX - bounds.left;
         var y = event.clientY - bounds.top;
-
         boxselector.style.left = x + 'px'
         boxselector.style.top = y + 'px'
       }
@@ -161,7 +158,7 @@ const Game = (props) => {
 
 
 
-
+//Stores initial character coordinates based on screensize
       useEffect(() => {
         setTimeout(() => {
             const initialselect = inputRef.current
@@ -207,10 +204,6 @@ const Game = (props) => {
             })
 
         }, 1000)
-
-
-
-
       }, []);
 
 
@@ -235,6 +228,7 @@ const Game = (props) => {
                         <img src={star} className='image-hold-two' ref={starstatus}></img>
                         <img src={fox} className='image-hold-two' ref={foxstatus}></img>
                     </div>
+                    <Stopwatch className='stopwatch' time={time} setTime={setTime} running={running} setRunning={setRunning} />
                   </div>
                   <img src={waldo} onClick={placeCharacters} onMouseMove={boxfollow} className='waldo-image' ref={inputRef} ></img>
                   {hoverarray.map((value, index) => {
@@ -291,9 +285,3 @@ export default Game;
 
 
 
-      //To achieve correct %'s
-      //It should be (Old X value * New Image Width) / (Old Image Width)
-      //The Problem gets fixed when we use BOTH WIDTHS FROM THE IMAGE/EVENT BOUNDING CLIENT. WIDTH AND HEIGHT
-      //The reason we kept getting a problem is because the window is different from the image and the height value would never change
-
-        //Below if statement opens up box for images of characters
