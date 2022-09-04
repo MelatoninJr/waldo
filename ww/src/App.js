@@ -9,23 +9,12 @@ import Game from './components/game'
 
 function App() {
 
-const [hoverarray, SetHoverArray] = useState([1])
-const [imagearray, SetImageArray] = useState([])
-
-
-
-
-
-
 return (
   <HashRouter basename='/'>
-    <Routes>
-      <Route path='/' element={<Game />} />
-    </Routes>
+    <Game />
   </HashRouter>
 );
 }
-
 export default App;
 
 
