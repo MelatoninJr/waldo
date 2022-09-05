@@ -134,7 +134,10 @@ const Game = (props) => {
         SetImageArray([])
         if(counter >= 2) {
             setRunning(false)
-            alert('You won!')
+            setTimeout(() => {
+                alert('You won!')
+            },500)
+            
         }
 
     }

@@ -11,7 +11,9 @@ function App() {
 
 return (
   <HashRouter basename='/'>
-    <Game />
+    <Routes>
+      <Route path='/' element={<Game/>} />
+    </Routes>
   </HashRouter>
 );
 }
